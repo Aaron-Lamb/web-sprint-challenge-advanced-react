@@ -3,15 +3,51 @@ import axios from "axios";
 
 export default class PlantList extends Component {
   // add state with a property called "plants" - initialize as an empty array
+  constructor() {
+    super();
+    this.state = {
+      plants: [],
+      search: ''
+    }
+  }
 
   // when the component mounts:
   //   - fetch data from the server endpoint - http://localhost:3333/plants
   //   - set the returned plants array to this.state.plants
 
+  componentDidMount() {
+    axios.get('http://localhost:3333/plants')
+    .then(response => this.setState({
+      plants: response.data.plantsData}))
+    .catch(error => console.log(error))
+  }
+  
   /*********  DON'T CHANGE ANYTHING IN THE RENDER FUNCTION *********/
   render() {
     return (
       <main className="plant-list">
+        <form onSubmit={(event) => {
+          event.preventDefault();
+      const results = this.state.plants.filter(plant => JSON.stringify(plant).includes(this.state.search));
+      this.setState({
+        plants: results
+      })
+      console.log(this.state.plants)
+        }}>
+          <label>Search 
+            <input 
+            type='text'
+            name='search'
+            id='search'
+            value={this.state.search}
+            onChange={(event) => {
+              this.setState({
+                search: event.target.value
+              })
+            }}
+            />
+          </label>
+        </form>
         {this.state?.plants?.map((plant) => (
           <div className="plant-card" key={plant.id}>
             <img className="plant-image" src={plant.img} alt={plant.name} />
